@@ -1,8 +1,6 @@
 package com.company;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -129,9 +127,63 @@ public class ObjIO {
         for(int i = 0; i < groupedFaceList.size(); i++){
             System.out.println(groupName.get(i));
             for(SingleFace f:groupedFaceList.get(i)){
+                if(f.isDeleted()){
+                    System.out.printf("deleted: ");
+                }
                 f.printVertexIndex();
+
             }
         }
+    }
+
+    public void outputFile(){
+        File outputFile = new File("output.obj");
+        try{
+            if(!outputFile.createNewFile()){
+                outputFile.delete();
+                outputFile.createNewFile();
+            }
+            writeIn(outputFile);
+
+        }catch (IOException ioe){
+            System.exit(4);
+        }
+    }
+
+    private void writeIn(File file) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        int faceGroupNum = 0;
+        int faceNum = 0;
+        List<SingleFace> currFaceList = groupedFaceList.get(faceGroupNum);
+        for(String currLine:fileContent){
+            if(currLine.startsWith("g ")){
+                faceGroupNum++;
+                faceNum = 0;
+                currFaceList = groupedFaceList.get(faceGroupNum);
+            }
+            if(currLine.startsWith("f ")){
+                SingleFace currFace = currFaceList.get(faceNum);
+                if(!currFace.isDeleted()){
+                    StringBuffer newData = new StringBuffer();
+                    newData.append("f ");
+                    for(int i = 0; i < currFace.vertexIndexList.size(); i++){
+                        newData.append(currFace.vertexIndexList.get(i)+"/");
+                        newData.append(currFace.vertexTextureIndexList.get(i)+"/");
+                        newData.append(currFace.vertexNormalIndexList.get(i));
+                        if(i < currFace.vertexIndexList.size()-1){
+                            newData.append(" ");
+                        }
+                    }
+                    bw.newLine();
+                    bw.write(newData.toString());
+                }
+                faceNum++;
+                continue;
+            }
+            bw.newLine();
+            bw.write(currLine);
+        }
+        bw.close();
     }
 
 

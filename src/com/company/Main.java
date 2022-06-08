@@ -11,5 +11,15 @@ public class Main {
         test.readFace();
         System.out.println("face: ");
         test.printAllFaceVertex();
+
+        FaceReducerOperator fro = new FaceReducerOperator(test);
+        fro.faceReduce();
+        fro.faceReduce();
+
+        System.out.println("face(reduced): ");
+        test.printAllFaceVertex();
+
+        test.outputFile();
+
     }
 }
