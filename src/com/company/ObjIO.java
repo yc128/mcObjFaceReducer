@@ -1,9 +1,7 @@
 package com.company;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class ObjIO {
     private BufferedReader br = null;
@@ -12,6 +10,10 @@ public class ObjIO {
     private List<List<Double>> vertexList = new ArrayList<List<Double>>();
     private List<List<SingleFace>> groupedFaceList = new ArrayList<List<SingleFace>>();
     private List<String> groupName = new ArrayList<String>();
+
+
+
+
 
     /**
      * getter method
@@ -28,6 +30,7 @@ public class ObjIO {
     public List<String> getGroupName() {
         return groupName;
     }
+
 
     public List<Double> getVertexByIndex(int i){
         if(i <= 0 || i >= vertexList.size()){
@@ -154,6 +157,7 @@ public class ObjIO {
         BufferedWriter bw = new BufferedWriter(new FileWriter(file));
         int faceGroupNum = 0;
         int faceNum = 0;
+        int vertexNum = 1;
         List<SingleFace> currFaceList = groupedFaceList.get(faceGroupNum);
         for(String currLine:fileContent){
             if(currLine.startsWith("g ")){
@@ -176,8 +180,24 @@ public class ObjIO {
                     }
                     bw.newLine();
                     bw.write(newData.toString());
+                }else{
+                    Config.deleted++;
                 }
                 faceNum++;
+                continue;
+            }
+            if(currLine.startsWith("v ")){
+                if(vertexNum < vertexList.size()){
+                    List<Double> currV = vertexList.get(vertexNum);
+                    StringBuffer newDataV = new StringBuffer();
+                    newDataV.append("v ");
+                    newDataV.append(currV.get(0)+" ");
+                    newDataV.append(currV.get(1)+" ");
+                    newDataV.append(currV.get(2));
+                    bw.newLine();
+                    bw.write(newDataV.toString());
+                    vertexNum++;
+                }
                 continue;
             }
             bw.newLine();

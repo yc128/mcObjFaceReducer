@@ -45,6 +45,17 @@ public class SingleFace {
         System.out.println();
     }
 
+    public void printVertex(ObjIO obj){
+        for(int i:vertexIndexList){
+            List<Double> v = obj.getVertexByIndex(i);
+            for(double d:v){
+                System.out.printf(d+ ", ");
+            }
+            System.out.printf("("+i+");  ");
+        }
+        System.out.println();
+    }
+
     /**
      * replace the repeated vertex to other vertex in face merged.
      * @param face
@@ -53,15 +64,15 @@ public class SingleFace {
     public void mergeFace(SingleFace face, ObjIO obj){
         List<Integer> deletedVertex = new ArrayList<>();
         //find the repeated vertex and store them.
-        for(int i = 0; i < face.vertexIndexList.size(); i++){
-            for(int j = 0; j < vertexIndexList.size(); j++){
-                if(face.vertexIndexList.get(i) == vertexIndexList.get(j)){
-                    deletedVertex.add(vertexIndexList.get(j));
-                }
+        for(int i:vertexIndexList){
+            if(face.vertexIndexList.contains(i)){
+                deletedVertex.add(i);
             }
         }
 
-        for(int v: vertexIndexList){
+        for(int j = 0; j < vertexIndexList.size(); j++){
+            int v = vertexIndexList.get(j);
+            //find the vertex which is not deleted and same in 2 axis.
             if(deletedVertex.contains(v)){
                 for(int newV: face.vertexIndexList){
                     if(!deletedVertex.contains(newV)){
@@ -73,10 +84,9 @@ public class SingleFace {
                                 numOfEqAxis++;
                             }
                         }
-                        System.out.println("numOfEqAx: "+ numOfEqAxis);
+//                        System.out.println("numOfEqAx: "+ numOfEqAxis);
                         if(numOfEqAxis == 2){
-                            int replaceIndex = vertexIndexList.indexOf(v);
-                            vertexIndexList.set(replaceIndex, newV);
+                            vertexIndexList.set(j, newV);
                         }
                     }
                 }
