@@ -1,4 +1,4 @@
-package com.company;
+package com.faceReducer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +61,20 @@ public class SingleFace {
      * @param face
      * @param obj
      */
-    public void mergeFace(SingleFace face, ObjIO obj){
+    public void mergeFace(SingleFace face, ObjIO obj, boolean isSlab){
         List<Integer> deletedVertex = new ArrayList<>();
         //find the repeated vertex and store them.
         for(int i:vertexIndexList){
             if(face.vertexIndexList.contains(i)){
                 deletedVertex.add(i);
+            }
+            if(isSlab){
+                for(int j:face.vertexIndexList){
+                    if(isSameCoordinate(i, j, obj)){
+                        deletedVertex.add(i);
+                        deletedVertex.add(j);
+                    }
+                }
             }
         }
 
@@ -80,7 +88,7 @@ public class SingleFace {
                         List<Double> vPos = obj.getVertexByIndex(v);
                         List<Double> newVPos = obj.getVertexByIndex(newV);
                         for(int i = 0; i < 3; i++){
-                            if(Math.abs(vPos.get(i) - newVPos.get(i))<0.00001){
+                            if(Math.abs(vPos.get(i) - newVPos.get(i))<0.0001){
                                 numOfEqAxis++;
                             }
                         }
@@ -95,6 +103,14 @@ public class SingleFace {
 
         face.deleteFace();
 
+    }
+
+    boolean isSameCoordinate(int vi1, int vi2, ObjIO obj){
+        List<Double> v1 = obj.getVertexByIndex(vi1);
+        List<Double> v2 = obj.getVertexByIndex(vi2);
+        return Math.abs(v1.get(0)-v2.get(0))<0.0001 &&
+                Math.abs(v1.get(1)-v2.get(1))<0.0001 &&
+                Math.abs(v1.get(2)-v2.get(2))<0.0001;
     }
 
 }

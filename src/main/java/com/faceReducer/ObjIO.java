@@ -1,7 +1,8 @@
-package com.company;
+package com.faceReducer;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObjIO {
     private BufferedReader br = null;
@@ -60,6 +61,8 @@ public class ObjIO {
             ioe.printStackTrace();
         }
     }
+
+
 
     /**
      * recognize and read vertex from content.
@@ -133,7 +136,8 @@ public class ObjIO {
                 if(f.isDeleted()){
                     System.out.printf("deleted: ");
                 }
-                f.printVertexIndex();
+//                f.printVertexIndex();
+                f.printVertex(this);
 
             }
         }
@@ -159,10 +163,13 @@ public class ObjIO {
         int faceNum = 0;
         int vertexNum = 1;
         List<SingleFace> currFaceList = groupedFaceList.get(faceGroupNum);
+        int deleted = 0;
         for(String currLine:fileContent){
             if(currLine.startsWith("g ")){
+                System.out.println(groupName.get(faceGroupNum)+" merged "+deleted+" faces");
                 faceGroupNum++;
                 faceNum = 0;
+                deleted = 0;
                 currFaceList = groupedFaceList.get(faceGroupNum);
             }
             if(currLine.startsWith("f ")){
@@ -181,6 +188,7 @@ public class ObjIO {
                     bw.newLine();
                     bw.write(newData.toString());
                 }else{
+                    deleted++;
                     Config.deleted++;
                 }
                 faceNum++;

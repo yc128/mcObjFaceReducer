@@ -1,10 +1,10 @@
-package com.company;
+package com.faceReducer;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        ObjIO test = new ObjIO("D:\\MCTools\\MCModels\\N700SHsub.obj");
+        ObjIO test = new ObjIO("D:\\MCTools\\MCModels\\N700SH.obj");
         test.readVertex();
         test.readFace();
 
@@ -15,10 +15,12 @@ public class Main {
         fro.faceReduce();
         System.out.println("face reducing2...");
         fro.faceReduce();
-//        System.out.println("face reducing3...");
-//        fro.faceReduce();
+        System.out.println("face reducing3...");
+        fro.faceReduce();
 //        System.out.println("face reducing4...");
 //        fro.faceReduce();
+//        System.out.println("inner face removing...");
+//        fro.innerFaceCheck();
         VertexReducerOperator vro = new VertexReducerOperator(test);
         System.out.println("vertex reducing...");
         vro.vertexReduction();

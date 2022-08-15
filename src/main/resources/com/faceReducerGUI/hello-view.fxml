@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.canvas.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+
+<VBox fx:id="rootLayout" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.faceReducerGUI.HelloController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+   <children>
+      <Pane prefHeight="362.0" prefWidth="560.0">
+         <children>
+             <Button layoutX="431.0" layoutY="33.0" onAction="#onChooseFileButtonClick" prefHeight="30.0" prefWidth="115.0" text="open file...">
+               <font>
+                  <Font size="18.0" />
+               </font></Button>
+            <TextField fx:id="filePathTF" editable="false" layoutX="8.0" layoutY="33.0" prefHeight="30.0" prefWidth="404.0" />
+            <Label fx:id="fileStatusLabel" layoutX="74.0" layoutY="69.0" prefHeight="144.0" prefWidth="390.0" />
+            <Button fx:id="startButton" disable="true" layoutX="185.0" layoutY="222.0" mnemonicParsing="false" onAction="#onStartButtonClick" prefHeight="42.0" prefWidth="169.0" text="Start">
+               <font>
+                  <Font size="22.0" />
+               </font>
+            </Button>
+            <ProgressBar fx:id="progressBar1" layoutX="57.0" layoutY="276.0" prefHeight="23.0" prefWidth="424.0" progress="0.0" />
+         </children>
+      </Pane>
+   
+       <Label fx:id="welcomeText" />
+   </children>
+</VBox>
