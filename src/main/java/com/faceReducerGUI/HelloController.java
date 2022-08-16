@@ -3,11 +3,9 @@ package com.faceReducerGUI;
 import com.faceReducer.Config;
 import com.faceReducer.ProcessMain;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -21,6 +19,8 @@ public class HelloController {
     @FXML
     private TextField filePathTF;
     @FXML
+    private TextField outputPathTF;
+    @FXML
     private Label fileStatusLabel;
     @FXML
     private Button startButton;
@@ -31,6 +31,9 @@ public class HelloController {
     void initialize(){
         Config.progressBar = progressBar1;
         fileStatusLabel.textProperty().bindBidirectional(Config.labelText);
+        startButton.disableProperty().bind(Config.isStartDisable);
+        Config.isStartDisable.set(true);
+
     }
 
     @FXML
@@ -42,13 +45,25 @@ public class HelloController {
         if(file != null && file.getName().endsWith(".obj")){
             Config.srcModelFile = file;
             filePathTF.setText(Config.srcModelFile.getPath());
+            Config.isFileChoose = true;
+            Config.isStartDisable.set(!Config.isOutputPathChoose);
             Config.labelText.set("File loaded");
-            startButton.setDisable(false);
-
-
         }else{
             Config.labelText.set("Invalid file path!");
+            Config.isFileChoose = false;
+            Config.isStartDisable.set(true);
         }
+    }
+
+    @FXML
+    protected void onChooseOutputPathClick(){
+        Stage stage = (Stage) rootLayout.getScene().getWindow();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        Config.outputPath = directoryChooser.showDialog(stage);
+        Config.isOutputPathChoose = true;
+        Config.isStartDisable.set(!Config.isFileChoose);
+        outputPathTF.setText(Config.outputPath.getPath());
+
     }
 
     @FXML

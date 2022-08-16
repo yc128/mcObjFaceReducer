@@ -144,7 +144,7 @@ public class ObjIO {
     }
 
     public void outputFile(){
-        File outputFile = new File("output.obj");
+        File outputFile = new File(Config.outputPath.getPath()+"\\"+"output.obj");
         try{
             if(!outputFile.createNewFile()){
                 outputFile.delete();
