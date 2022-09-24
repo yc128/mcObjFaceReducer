@@ -27,8 +27,6 @@ public class ProcessMain extends Thread{
         fro.faceReduce();
         setText("face reducing3...");
         fro.faceReduce();
-//        System.out.println("face reducing4...");
-//        fro.faceReduce();
 //        System.out.println("inner face removing...");
 //        fro.innerFaceCheck();
         VertexReducerOperator vro = new VertexReducerOperator(test);
