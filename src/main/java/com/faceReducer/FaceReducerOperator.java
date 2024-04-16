@@ -24,7 +24,7 @@ public class FaceReducerOperator {
 
 
     public void faceReduce(){
-        setProgressSum();
+        progressDisplay.setProgressSum(obj);
         boolean isSlab = false;
         for(List<SingleFace> faceList: obj.getGroupedFaceList()){
             System.out.println("reducing: "+obj.getGroupName().get(obj.getGroupedFaceList().indexOf(faceList)));
@@ -34,15 +34,7 @@ public class FaceReducerOperator {
         }
     }
 
-    private void setProgressSum(){
-        for(List<SingleFace> faceList: obj.getGroupedFaceList()){
-            for(SingleFace f:faceList){
-                if(!f.isDeleted()){
-                    progressDisplay.faceSum++;
-                }
-            }
-        }
-    }
+
 
 
 
@@ -66,7 +58,8 @@ public class FaceReducerOperator {
 
     /**
      * another attempt:
-     * split faces into three subList through x, y or z plane.
+     * split faces into three subList through x, y or z. For example:
+     * if all vertex of a face have the same value in x, it will be classified to x sublist.
      * then do searching only in every subList.
      * @param faceList
      */
@@ -93,12 +86,56 @@ public class FaceReducerOperator {
         sum = (long) (subX.size()+1)*subX.size() + (long) (subY.size()+1) *subY.size() + (long) (subZ.size()+1)*subZ.size();
         sum = sum/2;
         counter = 0;
-        faceReduceInClassifiedList(subX, 0, isSlab);
-        faceReduceInClassifiedList(subY, 1, isSlab);
-        faceReduceInClassifiedList(subZ, 2, isSlab);
+//        faceReduceInClassifiedList(subX, 0, isSlab);
+//        faceReduceInClassifiedList(subY, 1, isSlab);
+//        faceReduceInClassifiedList(subZ, 2, isSlab);
+
+        sortFaceThroughCoordinate(subX, 0, isSlab);
+        sortFaceThroughCoordinate(subY, 1, isSlab);
+        sortFaceThroughCoordinate(subZ, 2, isSlab);
 
     }
 
+
+    /**
+     * sort the face facing same direction through their level
+     * For example:
+     * in sublist of x(subX), all vertex of two faces have value 4 in x, they will be grouped into a sublist.
+     * Then do the searching in each sublist.
+     * @param list
+     * @param tag
+     * @param isSlab
+     */
+    private void sortFaceThroughCoordinate(List<SingleFace> list, int tag, boolean isSlab){
+        HashMap<Integer, Integer> coordinate2ListPos = new HashMap<>();
+        List<List<SingleFace>> listTable = new ArrayList<>();
+        for(SingleFace face:list){
+            int faceCoordinate = (obj.getVertexByIndex(face.vertexIndexList.get(0)).get(tag)).intValue();
+            if(coordinate2ListPos.get(faceCoordinate) != null){
+                listTable.get(coordinate2ListPos.get(faceCoordinate)).add(face);
+            }else{
+                List<SingleFace> tempList = new ArrayList<>();
+                tempList.add(face);
+                coordinate2ListPos.put(faceCoordinate, listTable.size());
+                listTable.add(tempList);
+            }
+        }
+
+        for(List<SingleFace> singleFaceList: listTable){
+            faceReduceInClassifiedList(singleFaceList, tag, isSlab);
+        }
+    }
+
+
+    /**
+     * Comparing all the faces one by one to figure out which two faces can be merged.
+     * If able to merge, call the merging function on these faces.
+     * Due to the difference between slab and normal block in mineways' output model,
+     * here uses another way to comparing the slabs.
+     * @param subList:face list
+     * @param tag:indicates which axi are these faces on
+     * @param isSlab:indicates whether these faces are slab
+     */
     private void faceReduceInClassifiedList(List<SingleFace> subList, int tag, boolean isSlab){
         for(int i = 0; i < subList.size(); i++){
             SingleFace currFace = subList.get(i);
@@ -109,23 +146,33 @@ public class FaceReducerOperator {
                 displayProcessPercentage();
                 SingleFace comparedFace = subList.get(j);
                 if(comparedFace.isDeleted()){continue;}
-                if(isSlab){
-                    if(isInSameFloor(currFace, comparedFace, tag)&&
-                    numberOfSameVertexStrict(currFace, comparedFace) >= 2){
-                        currFace.mergeFace(comparedFace, obj, isSlab);
-                        progressDisplay.updateCounter();
-                    }
-                }else{
-                    if(isInSameFloor(currFace, comparedFace, tag)&&
-                            numberOfSameVertex(currFace, comparedFace) >= 2){
-                        currFace.mergeFace(comparedFace, obj, isSlab);
-                        progressDisplay.updateCounter();
-                    }
+
+                if(isInSameFloor(currFace, comparedFace, tag) &&
+                        numberOfSameVertexChooser(currFace, comparedFace, isSlab) >= 2){
+                    currFace.mergeFace(comparedFace, obj, isSlab);
+                    progressDisplay.updateCounter();
                 }
 
             }
 
             progressDisplay.updateCounter();
+        }
+    }
+
+
+    /**
+     * Choose the right method for numberOfSameVertex though whether isSlab
+     * Because slabs don't share the same vertex though two of the vertex are in the same pos.
+     * @param face1
+     * @param face2
+     * @param isSlab
+     * @return
+     */
+    private int numberOfSameVertexChooser(SingleFace face1, SingleFace face2, boolean isSlab){
+        if(isSlab){
+            return numberOfSameVertexStrict(face1, face2);
+        }else{
+            return numberOfSameVertex(face1, face2);
         }
     }
 
@@ -178,50 +225,6 @@ public class FaceReducerOperator {
     }
 
 
-
-    public void innerFaceCheck(){
-        for(List<SingleFace> faceList:obj.getGroupedFaceList()){
-            String name = obj.getGroupName().get(obj.getGroupedFaceList().indexOf(faceList));
-            boolean isSlab = name.contains("Slab")&&!name.contains("Double");
-            if(isSlab){
-                removeInnerFace(faceList);
-            }
-        }
-    }
-    /**
-     * remove the faces which are 'inside the block'
-     * find the vertex which are only linked to one face, delete the face.
-     * @param faceList
-     */
-    private void removeInnerFace(List<SingleFace> faceList){
-        vertexLinkedFaceMap.clear();
-        usedVertexList.clear();
-        for(SingleFace face:faceList){
-            if(face.isDeleted()){continue;}
-            for(int vi: face.vertexIndexList){
-                List<Double> v = obj.getVertexByIndex(vi);
-                if(!usedVertexList.contains(v)){
-                    usedVertexList.add(v);
-                }
-                if(vertexLinkedFaceMap.get(v) == null){
-                    List<SingleFace> temp = new ArrayList<>();
-                    temp.add(face);
-                    vertexLinkedFaceMap.put(v, temp);
-                }else{
-                    vertexLinkedFaceMap.get(v).add(face);
-                }
-            }
-        }
-
-        for(List<Double> v:usedVertexList){
-//            System.out.println(vertexLinkedFaceMap.get(vi).size());
-            if(vertexLinkedFaceMap.get(v).size() == 1){
-                vertexLinkedFaceMap.get(v).get(0).deleteFace();
-            }
-        }
-    }
-
-
     /**
      * show the process
      */
@@ -235,6 +238,50 @@ public class FaceReducerOperator {
 
     //===========================================================================================
     //old method
+//    //May cause some bugs?
+//    public void innerFaceCheck(){
+//        for(List<SingleFace> faceList:obj.getGroupedFaceList()){
+//            String name = obj.getGroupName().get(obj.getGroupedFaceList().indexOf(faceList));
+//            boolean isSlab = name.contains("Slab")&&!name.contains("Double");
+//            if(isSlab){
+//                removeInnerFace(faceList);
+//            }
+//        }
+//    }
+//    /**
+//     * remove the faces which are 'inside the block'
+//     * find the vertex which are only linked to one face, delete the face. (redundant face)
+//     * @param faceList
+//     */
+//    private void removeInnerFace(List<SingleFace> faceList){
+//        vertexLinkedFaceMap.clear();
+//        usedVertexList.clear();
+//        for(SingleFace face:faceList){
+//            if(face.isDeleted()){continue;}
+//            for(int vi: face.vertexIndexList){
+//                List<Double> v = obj.getVertexByIndex(vi);
+//                if(!usedVertexList.contains(v)){
+//                    usedVertexList.add(v);
+//                }
+//                if(vertexLinkedFaceMap.get(v) == null){
+//                    List<SingleFace> temp = new ArrayList<>();
+//                    temp.add(face);
+//                    vertexLinkedFaceMap.put(v, temp);
+//                }else{
+//                    vertexLinkedFaceMap.get(v).add(face);
+//                }
+//            }
+//        }
+//
+//        for(List<Double> v:usedVertexList){
+////            System.out.println(vertexLinkedFaceMap.get(vi).size());
+//            if(vertexLinkedFaceMap.get(v).size() == 1){
+//                vertexLinkedFaceMap.get(v).get(0).deleteFace();
+//            }
+//        }
+//    }
+
+
 //    /**
 //     * Compare each faces in group to find faces available to merge.
 //     * @param faceList

@@ -143,6 +143,9 @@ public class ObjIO {
         }
     }
 
+    /**
+     * Create the output file and write the data to the file through "writeIn" method.
+     */
     public void outputFile(){
         File outputFile = new File(Config.outputPath.getPath()+"\\"+"output.obj");
         try{
@@ -157,6 +160,11 @@ public class ObjIO {
         }
     }
 
+    /**
+     * this method convert the result data to .obj format and write into the file.
+     * @param file
+     * @throws IOException
+     */
     private void writeIn(File file) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(file));
         int faceGroupNum = 0;
@@ -172,6 +180,8 @@ public class ObjIO {
                 deleted = 0;
                 currFaceList = groupedFaceList.get(faceGroupNum);
             }
+
+            //face data writing: if the face is not deleted, write the data from the list
             if(currLine.startsWith("f ")){
                 SingleFace currFace = currFaceList.get(faceNum);
                 if(!currFace.isDeleted()){
@@ -194,6 +204,8 @@ public class ObjIO {
                 faceNum++;
                 continue;
             }
+
+            //write in the vertex data. deleted vertex will not be written in the file.
             if(currLine.startsWith("v ")){
                 if(vertexNum < vertexList.size()){
                     List<Double> currV = vertexList.get(vertexNum);

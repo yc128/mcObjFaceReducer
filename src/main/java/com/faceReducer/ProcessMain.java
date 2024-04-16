@@ -5,6 +5,8 @@ import javafx.scene.control.Label;
 
 public class ProcessMain extends Thread{
     Label statusLabel;
+    private int totalProgress = 5;
+    private int currProgress = 1;
 
     public ProcessMain(Label l){
         statusLabel = l;
@@ -21,29 +23,32 @@ public class ProcessMain extends Thread{
 
 
         FaceReducerOperator fro = new FaceReducerOperator(test);
-        setText("face reducing1...");
+        setText("face reducing1..."+"("+currProgress+"/"+totalProgress+")");
         fro.faceReduce();
-        setText("face reducing2...");
+        currProgress++;
+        setText("face reducing2..."+"("+currProgress+"/"+totalProgress+")");
         fro.faceReduce();
-        setText("face reducing3...");
+        currProgress++;
+        setText("face reducing3..."+"("+currProgress+"/"+totalProgress+")");
         fro.faceReduce();
-//        System.out.println("face reducing4...");
-//        fro.faceReduce();
+        currProgress++;
 //        System.out.println("inner face removing...");
 //        fro.innerFaceCheck();
         VertexReducerOperator vro = new VertexReducerOperator(test);
-        setText("vertex reducing...");
+        setText("vertex reducing..."+"("+currProgress+"/"+totalProgress+")");
         vro.vertexReduction();
+        currProgress++;
 
         if(Config.isDebug){
             System.out.println("face(reduced): ");
             test.printAllFaceVertex();
         }
 
-        setText("file writing...");
+        setText("file writing..."+"("+currProgress+"/"+totalProgress+")");
         test.outputFile();
+        currProgress++;
         setText(Config.deleted+" faces is deleted");
-        setText("completed");
+        setText("completed"+"("+currProgress+"/"+totalProgress+")");
 
     }
 

@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
-public class HelloController {
+public class FaceReducerController {
     @FXML
     private Label welcomeText;
     @FXML

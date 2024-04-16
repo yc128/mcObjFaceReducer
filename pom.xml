@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>faceReducerGUI</artifactId>
+    <artifactId>mcObjFaceReducerGUI</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>faceReducerGUI</name>
+    <name>mcObjFaceReducerGUI</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +60,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.example.facereducergui/com.faceReducerGUI.HelloApplication
+                            <mainClass>com.example.facereducergui/com.faceReducerGUI.FaceReducerApplication
                             </mainClass>
                         </configuration>
                     </execution>
